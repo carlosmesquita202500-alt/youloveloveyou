@@ -6,8 +6,11 @@
   <title>Uma mensagem pra você ❤️</title>
   <style>
     :root{
-      --bg:#07070a; --txt:#f3f3f6; --muted:#b9b9c6;
-      --red:#ff2a55; --red2:#ff3d7a;
+      --bg:#07070a;
+      --txt:#f3f3f6;
+      --muted:#b9b9c6;
+      --red:#ff2a55;
+      --red2:#ff3d7a;
       --stroke: rgba(255,255,255,.10);
       --radius: 22px;
       --shadow: 0 30px 90px rgba(0,0,0,.65);
@@ -16,101 +19,156 @@
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
-      margin:0; font-family: var(--sans); color: var(--txt);
+      margin:0;
+      font-family: var(--sans);
+      color: var(--txt);
       background:
         radial-gradient(900px 520px at 50% 20%, rgba(255,42,85,.20), transparent 60%),
         radial-gradient(900px 520px at 20% 80%, rgba(255,61,122,.12), transparent 60%),
         var(--bg);
-      overflow-x:hidden;
+      overflow:hidden;
     }
 
-    .bgPhoto{position:fixed; inset:0; background-size:cover; background-position:center; opacity:.16; filter: blur(2px) saturate(1.1); transform: scale(1.05); pointer-events:none; display:none;}
-    .bgShade{position:fixed; inset:0; background: radial-gradient(900px 520px at 50% 20%, rgba(255,42,85,.26), transparent 60%), linear-gradient(180deg, rgba(7,7,10,.75), rgba(7,7,10,.9)); pointer-events:none;}
+    .hearts{
+      position:fixed; inset:0;
+      pointer-events:none;
+      opacity:.75;
+      filter: drop-shadow(0 10px 20px rgba(255,42,85,.15));
+    }
+    .heart{
+      position:absolute;
+      width:10px; height:10px;
+      transform: rotate(45deg);
+      background: rgba(255,42,85,.8);
+      animation: floatUp linear infinite;
+      border-radius: 2px;
+    }
+    .heart:before,.heart:after{
+      content:"";
+      position:absolute;
+      width:10px; height:10px;
+      background: inherit;
+      border-radius: 50%;
+    }
+    .heart:before{ left:-5px; top:0; }
+    .heart:after{ left:0; top:-5px; }
+    @keyframes floatUp{
+      0%{ transform: translateY(0) rotate(45deg); opacity:0; }
+      10%{opacity:.95}
+      100%{ transform: translateY(-120vh) rotate(45deg); opacity:0; }
+    }
 
-    .hearts{position:fixed; inset:0; pointer-events:none; opacity:.75; filter: drop-shadow(0 10px 20px rgba(255,42,85,.15));}
-    .heart{position:absolute; width:10px; height:10px; transform: rotate(45deg); background: rgba(255,42,85,.8); animation: floatUp linear infinite; border-radius:2px;}
-    .heart:before,.heart:after{content:""; position:absolute; width:10px; height:10px; background:inherit; border-radius:50%;}
-    .heart:before{left:-5px; top:0;} .heart:after{left:0; top:-5px;}
-    @keyframes floatUp{0%{transform: translateY(0) rotate(45deg); opacity:0;} 10%{opacity:.95} 100%{transform: translateY(-120vh) rotate(45deg); opacity:0;}}
-
-    .wrap{min-height:100%; display:grid; place-items:center; padding: 22px;}
+    .wrap{
+      height:100%;
+      display:grid;
+      place-items:center;
+      padding: 22px;
+    }
     .card{
-      width:min(900px, 100%);
+      width:min(760px, 100%);
       border-radius: var(--radius);
       border: 1px solid var(--stroke);
-      background: radial-gradient(900px 520px at 30% 10%, rgba(255,42,85,.14), transparent 60%),
-                  linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      background:
+        radial-gradient(900px 520px at 30% 10%, rgba(255,42,85,.14), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
       box-shadow: var(--shadow);
       padding: 22px;
       position:relative;
       overflow:hidden;
     }
-    .card:after{content:""; position:absolute; inset:-50px; background: radial-gradient(circle at 70% 35%, rgba(255,61,122,.12), transparent 55%); pointer-events:none;}
-
-    .top{display:flex; gap:14px; align-items:center; justify-content:space-between; flex-wrap:wrap; position:relative; z-index:1;}
-    .badge{display:inline-flex; align-items:center; gap:10px; border:1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.06); padding: 10px 12px; border-radius:999px; color: var(--muted); font-weight:700; width:fit-content;}
-    .btn{display:inline-flex; align-items:center; justify-content:center; gap:10px; padding:10px 14px; border-radius:999px; border:1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.06); color: var(--txt); font-weight:800; cursor:pointer; user-select:none; transition: transform .12s ease, background .12s ease, border-color .12s ease;}
-    .btn:hover{transform: translateY(-1px); background: rgba(255,255,255,.09); border-color: rgba(255,255,255,.20);}
-
-    h1{margin: 16px 0 8px; font-size: clamp(28px, 3.5vw, 44px); letter-spacing: -.8px; position:relative; z-index:1;}
-    .msg{margin: 10px 0 14px; font-size: 18px; line-height: 1.6; color: rgba(243,243,246,.95); position:relative; z-index:1; white-space: pre-wrap;}
-    .sig{margin-top: 10px; color: var(--muted); font-weight: 800; position:relative; z-index:1;}
-    .hint{margin-top: 14px; color: rgba(185,185,198,.92); font-size: 13px; position:relative; z-index:1;}
-
-    .mediaGrid{margin-top: 16px; display:grid; grid-template-columns: 1fr; gap: 14px; position:relative; z-index:1;}
-    .panel{border:1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.22); border-radius: 18px; padding: 14px;}
-    .photos{display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px;}
-    .photos img{width:100%; aspect-ratio: 4 / 3; height:auto; object-fit: contain; border-radius: 14px; border:1px solid rgba(255,255,255,.10); background: rgba(255,255,255,.06);}
-    .videoWrap video, .videoWrap iframe{width:100%; aspect-ratio: 16/9; border-radius: 14px; border:1px solid rgba(255,255,255,.10); background:#000;}
-    audio{width:100%;}
-    .playHint{margin-top:10px; color: rgba(185,185,198,.92); font-size: 12px; line-height:1.4;}
-    .bigHeart{position:absolute; right:-40px; top:-40px; width:220px; height:220px; transform: rotate(10deg); opacity:.15; filter: blur(.2px); pointer-events:none;}
-    @media (max-width: 820px){ .photos{grid-template-columns: repeat(2, 1fr);} .photos img{width:100%; aspect-ratio: 4 / 3; height:auto; object-fit: contain; border-radius: 14px; border:1px solid rgba(255,255,255,.10); background: rgba(255,255,255,.06);} }
-    @media (max-width: 520px){ .msg{font-size:16px;} .photos{grid-template-columns:1fr;} .photos img{width:100%; aspect-ratio: 4 / 3; height:auto; object-fit: contain; border-radius: 14px; border:1px solid rgba(255,255,255,.10); background: rgba(255,255,255,.06);} }
-  
-    .lightbox{
-      position:fixed; inset:0;
-      display:none;
-      align-items:center; justify-content:center;
-      background: rgba(0,0,0,.72);
-      padding: 18px;
-      z-index: 9999;
-      backdrop-filter: blur(6px);
+    .card:after{
+      content:"";
+      position:absolute; inset:-50px;
+      background: radial-gradient(circle at 70% 35%, rgba(255,61,122,.12), transparent 55%);
+      pointer-events:none;
     }
-    .lightbox.open{display:flex;}
-    .lightbox img{
-      max-width: min(980px, 96vw);
-      max-height: 88vh;
-      border-radius: 18px;
+
+    .top{
+      display:flex;
+      gap:14px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+      position:relative;
+      z-index:1;
+    }
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
       border:1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.35);
-    }
-    .tapHint{
-      position: fixed;
-      left: 50%;
-      bottom: 18px;
-      transform: translateX(-50%);
-      z-index: 9998;
-      display:none;
-      padding: 10px 14px;
+      background: rgba(255,255,255,.06);
+      padding: 10px 12px;
       border-radius: 999px;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.35);
-      color: rgba(243,243,246,.92);
-      font-weight: 800;
-      font-size: 13px;
+      color: var(--muted);
+      font-weight:700;
+      width: fit-content;
     }
-    .tapHint.show{display:inline-flex;}
-    
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:10px;
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--txt);
+      font-weight:800;
+      cursor:pointer;
+      user-select:none;
+      transition: transform .12s ease, background .12s ease, border-color .12s ease;
+    }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.09); border-color: rgba(255,255,255,.20); }
+
+    h1{
+      margin: 16px 0 8px;
+      font-size: clamp(28px, 3.5vw, 44px);
+      letter-spacing: -.8px;
+      position:relative;
+      z-index:1;
+    }
+    .msg{
+      margin: 10px 0 16px;
+      font-size: 18px;
+      line-height: 1.6;
+      color: rgba(243,243,246,.95);
+      position:relative;
+      z-index:1;
+      white-space: pre-wrap;
+    }
+    .sig{
+      margin-top: 10px;
+      color: var(--muted);
+      font-weight: 800;
+      position:relative;
+      z-index:1;
+    }
+    .hint{
+      margin-top: 14px;
+      color: rgba(185,185,198,.92);
+      font-size: 13px;
+      position:relative;
+      z-index:1;
+    }
+
+    .bigHeart{
+      position:absolute;
+      right: -40px;
+      top: -40px;
+      width: 220px;
+      height: 220px;
+      transform: rotate(10deg);
+      opacity:.15;
+      filter: blur(.2px);
+      pointer-events:none;
+    }
+
+    @media (max-width: 520px){
+      .msg{font-size: 16px;}
+    }
   </style>
 </head>
 <body>
-  <div class="bgPhoto" id="bgPhoto" aria-hidden="true"></div>
-  <div class="bgShade" aria-hidden="true"></div>
   <div class="hearts" id="hearts" aria-hidden="true"></div>
-
-  <div class="lightbox" id="lightbox" aria-hidden="true"><img id="lightboxImg" alt="Foto em tamanho maior"/></div>
-  <div class="tapHint" id="tapHint">Toque em qualquer lugar para tocar a música 🎵</div>
 
   <div class="wrap">
     <div class="card">
@@ -120,29 +178,18 @@
 
       <div class="top">
         <div class="badge">❤️ Uma mensagem especial</div>
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <button class="btn" id="playBtn" type="button" style="display:none;">Tocar música</button>
-          <button class="btn" id="shareBtn" type="button">Compartilhar</button>
-        </div>
+        <button class="btn" id="shareBtn" type="button">Compartilhar</button>
       </div>
 
-      <h1 id="title">Pra você ❤️</h1>
+      <h1 id="title">Pra você</h1>
       <div class="msg" id="msg"></div>
       <div class="sig" id="sig"></div>
-
-      <div class="panel" id="timerBox" style="margin-top:14px;">
-        <div style="font-weight:900; margin-bottom:8px;">⏳ Desde o momento do QR…</div>
-        <div id="timerPretty" style="font-size:18px; font-weight:900; letter-spacing:.2px;"></div>
-        <div id="timerDetail" style="margin-top:6px; color: rgba(185,185,198,.92); font-size:13px;"></div>
-      </div>
-
-      <div class="mediaGrid" id="mediaGrid"></div>
-
       <div class="hint">Se isso te fez sorrir, missão cumprida. 💘</div>
     </div>
   </div>
 
   <script>
+    // floating hearts
     (function spawnHearts(){
       const box = document.getElementById('hearts');
       const count = 22;
@@ -169,258 +216,15 @@
       const url = new URL(window.location.href);
       return (url.searchParams.get(name) || "").trim();
     }
-    function safeDecode(v){ try{ return decodeURIComponent(v || ""); }catch{ return v || ""; } }
 
-    const to = safeDecode(getParam("to"));
-    const from = safeDecode(getParam("from"));
-    const msg = safeDecode(getParam("msg"));
-    const bundle = (getParam("bundle") || "0") === "1";
-
-    const createdParam = safeDecode(getParam("created"));
-    let createdMs = Number(createdParam);
-    if(!Number.isFinite(createdMs) || createdMs <= 0){
-      createdMs = Date.now();
-    }
-
-    function pad2(n){ return String(n).padStart(2,"0"); }
-    function formatElapsed(ms){
-      const totalSec = Math.max(0, Math.floor(ms/1000));
-      const days = Math.floor(totalSec / 86400);
-      const hours = Math.floor((totalSec % 86400) / 3600);
-      const mins = Math.floor((totalSec % 3600) / 60);
-      const secs = totalSec % 60;
-      let pretty = "";
-      if(days > 0){
-        pretty = `${days} dia${days===1?"":"s"} • ${pad2(hours)}:${pad2(mins)}:${pad2(secs)}`;
-      }else{
-        pretty = `${pad2(hours)}:${pad2(mins)}:${pad2(secs)}`;
-      }
-      return {days, hours, mins, secs, pretty};
-    }
-
-    function tickTimer(){
-      const now = Date.now();
-      const diff = now - createdMs;
-      const t = formatElapsed(diff);
-
-      const prettyEl = document.getElementById("timerPretty");
-      const detailEl = document.getElementById("timerDetail");
-
-      if(prettyEl) prettyEl.textContent = `💞 ${t.pretty}`;
-
-      if(detailEl){
-        const started = new Date(createdMs);
-        const startedStr = started.toLocaleString("pt-BR", { dateStyle:"long", timeStyle:"short" });
-        const line = (t.days >= 1)
-          ? `E desde então, cada segundo só aumenta o carinho. (começou em ${startedStr})`
-          : `Começou em ${startedStr}. E já dá pra sentir o coração acelerar, né? 💓`;
-        detailEl.textContent = line;
-      }
-    }
-
+    const to = decodeURIComponent(getParam("to"));
+    const from = decodeURIComponent(getParam("from"));
+    const msg = decodeURIComponent(getParam("msg"));
 
     document.getElementById("title").textContent = to ? ("Para " + to + " ❤️") : "Pra você ❤️";
     document.getElementById("msg").textContent =
       msg || "Eu fiz essa página só pra você. Quando você lê isso, eu tô pensando em você. 💖";
     document.getElementById("sig").textContent = from ? ("— " + from) : "— com amor";
-
-    const mediaGrid = document.getElementById("mediaGrid");
-    
-    const lightbox = document.getElementById("lightbox");
-    const lightboxImg = document.getElementById("lightboxImg");
-    function openLightbox(src){
-      if(!lightbox || !lightboxImg) return;
-      lightboxImg.src = src;
-      lightbox.classList.add("open");
-      lightbox.setAttribute("aria-hidden","false");
-    }
-    function closeLightbox(){
-      if(!lightbox) return;
-      lightbox.classList.remove("open");
-      lightbox.setAttribute("aria-hidden","true");
-      if(lightboxImg) lightboxImg.src = "";
-    }
-
-function addPanel(title, contentEl){
-      const p = document.createElement("div");
-      p.className = "panel";
-      const h = document.createElement("div");
-      h.style.fontWeight = "900";
-      h.style.marginBottom = "10px";
-      h.textContent = title;
-      p.appendChild(h);
-      p.appendChild(contentEl);
-      mediaGrid.appendChild(p);
-    }
-
-    function isYouTube(url){
-      return /youtube\.com\/(watch\?v=|embed\/)|youtu\.be\//i.test(url || "");
-    }
-    function youtubeEmbed(url){
-      try{
-        const u = new URL(url);
-        if(u.hostname.includes("youtu.be")){
-          const id = u.pathname.replace("/", "");
-          return "https://www.youtube.com/embed/" + id;
-        }
-        const v = u.searchParams.get("v");
-        if(v) return "https://www.youtube.com/embed/" + v;
-        if(u.pathname.includes("/embed/")) return url;
-      }catch{}
-      return url;
-    }
-
-    async function renderMedia({photosParam, musicUrl, videoUrl, auto, loop}){
-      // Photos
-      if(photosParam){
-        const urls = photosParam.split(",").map(s=>s.trim()).filter(Boolean).slice(0,12);
-        if(urls.length){
-          const wrap = document.createElement("div");
-          wrap.className = "photos";
-          urls.forEach(u=>{
-            const img = document.createElement("img");
-            img.loading = "lazy";
-            img.alt = "Foto";
-            img.src = u;
-            img.style.cursor = "zoom-in";
-            img.addEventListener("click", ()=> openLightbox(u));
-            wrap.appendChild(img);
-          });
-          addPanel("📸 Nossas fotos", wrap);
-
-          const bg = document.getElementById("bgPhoto");
-          bg.style.backgroundImage = `url('${urls[0].replace(/'/g, "%27")}')`;
-          bg.style.display = "block";
-        }
-      }
-
-      // Music
-      const playBtn = document.getElementById("playBtn");
-      if(musicUrl){
-        const wrap = document.createElement("div");
-        const audioEl = document.createElement("audio");
-        audioEl.controls = true;
-        audioEl.src = musicUrl;
-        audioEl.preload = "none";
-        if(loop) audioEl.loop = true;
-
-        const hint = document.createElement("div");
-        hint.className = "playHint";
-        hint.textContent = "Se não tocar sozinho, toque no botão “Tocar música” (alguns celulares bloqueiam autoplay).";
-
-        wrap.appendChild(audioEl);
-        wrap.appendChild(hint);
-        addPanel("🎵 Música", wrap);
-
-        
-        // Start music on first interaction anywhere (no button)
-        try{ playBtn.style.display = "none"; }catch(e){}
-
-        const tapHint = document.getElementById("tapHint");
-        function showHint(){ if(tapHint) tapHint.classList.add("show"); }
-        function hideHint(){ if(tapHint) tapHint.classList.remove("show"); }
-
-        // expose audio globally so we can start on first touch/click
-        window.__loveAudio = audioEl;
-
-        async function tryPlay(){
-          if(!window.__loveAudio) return;
-          try{
-            await window.__loveAudio.play();
-            hideHint();
-            removeListeners();
-          }catch(e){
-            showHint();
-          }
-        }
-
-        function onFirstInteract(){ tryPlay(); }
-
-        function removeListeners(){
-          window.removeEventListener("pointerdown", onFirstInteract, true);
-          window.removeEventListener("touchstart", onFirstInteract, true);
-          window.removeEventListener("click", onFirstInteract, true);
-        }
-
-        // capture first interaction anywhere on page
-        window.addEventListener("pointerdown", onFirstInteract, true);
-        window.addEventListener("touchstart", onFirstInteract, true);
-        window.addEventListener("click", onFirstInteract, true);
-
-        if(auto){
-          setTimeout(()=>{ tryPlay(); }, 350);
-        }else{
-          showHint();
-        }
-      }
-
-      // Video
-      if(videoUrl){
-        const wrap = document.createElement("div");
-        wrap.className = "videoWrap";
-
-        if(isYouTube(videoUrl)){
-          const iframe = document.createElement("iframe");
-          iframe.src = youtubeEmbed(videoUrl);
-          iframe.title = "Vídeo";
-          iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
-          iframe.allowFullscreen = true;
-          wrap.appendChild(iframe);
-        }else{
-          const video = document.createElement("video");
-          video.controls = true;
-          video.playsInline = true;
-          video.preload = "metadata";
-          video.src = videoUrl;
-          wrap.appendChild(video);
-        }
-        addPanel("🎬 Vídeo", wrap);
-      }
-    }
-
-    async function renderFromParams(){
-      const photosParam = safeDecode(getParam("photos"));
-      const musicUrl = safeDecode(getParam("music"));
-      const videoUrl = safeDecode(getParam("video"));
-      const auto = (getParam("auto") || "0") === "1";
-      const loop = (getParam("loop") || "0") === "1";
-      await renderMedia({ photosParam, musicUrl, videoUrl, auto, loop });
-    }
-
-    async function renderFromManifest(){
-      try{
-        const res = await fetch("./media/manifest.json", {cache:"no-store"});
-        if(!res.ok) throw new Error("manifest.json não encontrado");
-        const m = await res.json();
-        const photosParam = (m.photos || []).join(",");
-        await renderMedia({
-          photosParam,
-          musicUrl: m.music || "",
-          videoUrl: m.video || "",
-          auto: String(m.autoplay || 0) === "1",
-          loop: String(m.loop || 0) === "1"
-        });
-      }catch(e){
-        const warn = document.createElement("div");
-        warn.textContent = "Não consegui carregar as mídias do bundle. (" + (e && e.message ? e.message : e) + ")";
-        warn.style.color = "rgba(185,185,198,.92)";
-        addPanel("⚠️ Mídias", warn);
-      }
-    }
-
-    tickTimer();
-    setInterval(tickTimer, 1000);
-
-    if(bundle){
-      renderFromManifest();
-    }else{
-      renderFromParams();
-    }
-
-    if(lightbox){
-      lightbox.addEventListener("click", (e)=>{ if(e.target === lightbox) closeLightbox(); });
-    }
-    window.addEventListener("keydown", (e)=>{ if(e.key === "Escape") closeLightbox(); });
 
     document.getElementById("shareBtn").addEventListener("click", async () => {
       try{
@@ -430,7 +234,9 @@ function addPanel(title, contentEl){
           await navigator.clipboard.writeText(window.location.href);
           alert("Link copiado!");
         }
-      }catch(e){}
+      }catch(e){
+        // cancel share => ignore
+      }
     });
   </script>
 </body>

@@ -176,7 +176,7 @@
       color: var(--muted);
       font-size: 16px;
       line-height:1.5;
-      max-width: 70ch;
+      max-width: 56ch;
     }
     .hero-actions{
       display:flex;
@@ -186,7 +186,90 @@
       margin-top: 12px;
     }
 
-    section{ margin-top: 22px; }
+    .phoneWrap{
+      display:grid;
+      place-items:center;
+      position:relative;
+      min-height: 360px;
+    }
+    .phone{
+      width:min(330px, 100%);
+      aspect-ratio: 9/18;
+      border-radius: 38px;
+      border: 1px solid rgba(255,255,255,.18);
+      background:
+        radial-gradient(260px 200px at 30% 15%, rgba(255,42,85,.22), transparent 70%),
+        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03)),
+        rgba(18,18,27,.55);
+      box-shadow: 0 35px 100px rgba(0,0,0,.65);
+      padding: 18px 16px;
+      position:relative;
+      overflow:hidden;
+    }
+    .notch{
+      width: 40%;
+      height: 22px;
+      border-radius: 0 0 16px 16px;
+      background: rgba(0,0,0,.45);
+      border:1px solid rgba(255,255,255,.08);
+      position:absolute; top:0; left:50%; transform:translateX(-50%);
+    }
+    .screen{
+      margin-top: 20px;
+      border-radius: 26px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.35);
+      height: calc(100% - 28px);
+      padding: 18px;
+      display:flex;
+      flex-direction:column;
+      gap: 12px;
+    }
+    .screen .title{
+      font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
+      font-size: 18px;
+      opacity:.95;
+    }
+    .screen .mini{
+      color: var(--muted);
+      font-size: 12px;
+      line-height:1.4;
+    }
+    .mockQr{
+      margin-top:auto;
+      display:flex;
+      gap:12px;
+      align-items:flex-end;
+    }
+    .qrBox{
+      width: 110px;
+      height: 110px;
+      background: #fff;
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,.08);
+      position:relative;
+      overflow:hidden;
+    }
+    .qrBox:after{
+      content:"♥";
+      position:absolute;
+      inset:0;
+      display:grid; place-items:center;
+      font-size: 30px;
+      color: rgba(255,42,85,.95);
+      mix-blend-mode:multiply;
+    }
+    .mockCard{
+      flex:1;
+      background: rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: 16px;
+      padding: 12px;
+    }
+
+    section{
+      margin-top: 22px;
+    }
     .grid{
       display:grid;
       grid-template-columns: 1fr 1fr;
@@ -289,38 +372,6 @@
       overflow:auto;
       white-space: nowrap;
     }
-    .danger{
-      display:none;
-      width:100%;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(255,42,85,.08);
-      border-radius: 14px;
-      padding: 10px 12px;
-      color: rgba(243,243,246,.92);
-      font-size: 13px;
-      line-height:1.45;
-    }
-    .checkrow{
-      width:100%;
-      display:flex;
-      gap:10px;
-      align-items:center;
-      justify-content:center;
-      flex-wrap:wrap;
-      color: rgba(243,243,246,.92);
-      font-weight:800;
-      font-size: 13px;
-    }
-    .checkrow input{ width:auto; }
-
-    .fileRow{
-      display:grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 12px;
-      margin-top: 10px;
-    }
-    .fileRow input{ padding: 10px; }
-    .small{font-size:12px; color: rgba(185,185,198,.88);}
 
     footer{
       margin-top: 26px;
@@ -335,7 +386,6 @@
       .grid{ grid-template-columns: 1fr; }
       .genWrap{ grid-template-columns: 1fr; }
       .navlinks{ display:none; }
-      .fileRow{ grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -356,7 +406,7 @@
       <div class="navlinks">
         <a href="#como">Como funciona</a>
         <a href="#gerar">Gerar QR</a>
-        <a href="#local">Arquivos locais</a>
+        <a href="#faq">FAQ</a>
       </div>
 
       <a class="btn primary" href="#gerar">Criar meu QR Code</a>
@@ -367,9 +417,10 @@
     <section class="hero" id="topo">
       <div>
         <div class="pill"><span class="stars">★★★★★</span> <span>feito pra impressionar 💘</span></div>
-        <h1>Crie um <span style="color:var(--red2)">QR Code romântico</span><br/>com música, fotos e vídeo</h1>
+        <h1>Crie um <span style="color:var(--red2)">QR Code romântico</span><br/>com uma página especial</h1>
         <p class="sub">
-          Layout bonito (v2) + correções (v4): gera QR confiável, suporta <b>mídias por URL</b> e também <b>mídias por arquivos do PC</b> (gera ZIP para Netlify).
+          Você preenche nomes e a mensagem, e o site gera um QR Code com coração no centro.
+          Ao escanear, abre uma página linda com a dedicatória.
         </p>
         <div class="hero-actions">
           <a class="btn primary" href="#gerar">Criar agora</a>
@@ -382,10 +433,21 @@
         </div>
       </div>
 
-      <div class="card">
-        <h2 style="margin-top:0">Dica</h2>
-        <p><b>URL do seu site</b> só é necessário quando você já publicou no Netlify (aí o QR abre no celular dela).</p>
-        <p style="margin-top:10px;">Para arquivos locais, use a seção “Arquivos locais” e gere um ZIP pronto.</p>
+      <div class="phoneWrap">
+        <div class="phone" role="img" aria-label="Mockup do QR romântico no celular">
+          <div class="notch"></div>
+          <div class="screen">
+            <div class="title">Meu amor,</div>
+            <div class="mini">eu fiz isso só pra você. Escaneia o QR e abre a surpresa ✨</div>
+            <div class="mockQr">
+              <div class="qrBox" aria-hidden="true"></div>
+              <div class="mockCard">
+                <div style="font-weight:800; font-size:13px;">Surpresa ❤️</div>
+                <div class="mini">uma mensagem que dá frio na barriga</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -395,16 +457,16 @@
         <p>Preencha “Para”, “De” e sua mensagem. Pode colocar emojis, texto curtinho ou declaração inteira.</p>
       </div>
       <div class="card">
-        <h2>2) Você adiciona mídia</h2>
-        <p>Por <b>URL</b> (links) ou por <b>arquivos do PC</b> (gera ZIP). A página final mostra tudo bonitinho.</p>
+        <h2>2) A gente gera o QR</h2>
+        <p>O QR sai com <b>coração no centro</b> e pronto pra baixar. Você coloca em cartão, foto, presente, etc.</p>
       </div>
     </section>
 
     <section id="gerar" class="card" style="margin-top:16px;">
       <h2>Gerar seu QR Code romântico</h2>
-      <p>Ao escanear, ele abre a página <span style="font-family:var(--mono)">love.html</span> com sua mensagem.</p>
+      <p>Quando escanear, ele abre a página <span style="font-family:var(--mono)">love.html</span> com sua mensagem.</p>
 
-      <div class="genWrap">
+      <div class="genWrap" style="margin-top:14px;">
         <div>
           <div class="row">
             <div>
@@ -420,52 +482,25 @@
           <label for="message">Mensagem</label>
           <textarea id="message" placeholder="Escreva algo romântico… 💖"></textarea>
 
-          <label for="photoUrls">Fotos (URLs) — uma por linha (jpg/png/webp)</label>
-          <textarea id="photoUrls" placeholder="Ex:
-https://site.com/foto1.jpg
-https://site.com/foto2.png" style="min-height:92px;"></textarea>
-
-          <div class="row">
-            <div>
-              <label for="musicUrl">Música (URL .mp3)</label>
-              <input id="musicUrl" placeholder="https://site.com/musica.mp3" />
-            </div>
-            <div>
-              <label for="videoUrl">Vídeo (URL .mp4 ou YouTube)</label>
-              <input id="videoUrl" placeholder="https://site.com/video.mp4 ou https://youtu.be/..." />
-            </div>
-          </div>
-
-          <div class="checkrow" style="justify-content:flex-start;">
-            <label><input type="checkbox" id="autoplayMusic" /> Tentar autoplay</label>
-            <label><input type="checkbox" id="loopMusic" checked /> Loop</label>
-          </div>
-
-          <label for="baseUrl">URL do seu site (Netlify)</label>
-          <input id="baseUrl" placeholder="Ex: https://seu-site.netlify.app" />
-
-          <div class="checkrow" style="justify-content:flex-start;">
-            <label><input type="checkbox" id="useBundle" /> Usar mídias do ZIP (bundle)</label>
-            <label><input type="checkbox" id="lockCreated" /> Fixar “momento do QR” (não muda ao regenerar)</label>
-          </div>
+          <label for="baseUrl">URL do seu site (recomendado quando você hospedar)</label>
+          <input id="baseUrl" placeholder="Ex: https://seu-dominio.com" />
 
           <div class="helper">
-            • Se você vai usar <b>arquivos locais</b>, marque “bundle” e suba o ZIP no Netlify.
+            • Se deixar a URL vazia, vai gerar um link relativo (<span style="font-family:var(--mono)">./love.html</span>) que funciona localmente,
+            mas para o QR funcionar no celular “em qualquer lugar”, hospede e preencha seu domínio.
           </div>
 
           <div class="hero-actions" style="margin-top:14px;">
             <button class="btn primary" id="btnGenerate" type="button">Gerar QR romântico</button>
             <button class="btn" id="btnCopy" type="button">Copiar link</button>
           </div>
-
-          <div class="danger" id="errBox"></div>
         </div>
 
         <div class="qrOut">
           <div class="qrCanvasWrap">
             <div id="qrcode"></div>
             <!-- overlay coração -->
-            <svg width="110" height="110" viewBox="0 0 110 110"
+            <svg id="heartOverlay" width="110" height="110" viewBox="0 0 110 110"
                  style="position:absolute; inset:0; margin:auto; width:120px; height:120px; pointer-events:none;">
               <defs>
                 <radialGradient id="g" cx="30%" cy="30%" r="70%">
@@ -488,56 +523,27 @@ https://site.com/foto2.png" style="min-height:92px;"></textarea>
       </div>
     </section>
 
-    <section id="local" class="card">
-      <h2>Arquivos locais (sem URL)</h2>
-      <p>
-        Selecione fotos/música/vídeo do seu PC e gere um <b>ZIP pronto</b> com pasta <b>media/</b>.
-        Depois é só arrastar a pasta pro Netlify.
-      </p>
-
-      <label>Fotos (selecione várias)</label>
-      <input type="file" id="localPhotos" accept="image/*" multiple />
-
-      <div class="fileRow">
-        <div>
-          <label>Música (mp3)</label>
-          <input type="file" id="localMusic" accept="audio/*" />
-        </div>
-        <div>
-          <label>Vídeo (mp4)</label>
-          <input type="file" id="localVideo" accept="video/*" />
-        </div>
-        <div>
-          <label>Opcional: nome do ZIP</label>
-          <input id="zipName" placeholder="Ex: presente-julia.zip" />
-        </div>
+    <section id="faq" class="grid">
+      <div class="card">
+        <h2>Funciona sem internet?</h2>
+        <p>Pra escanear e abrir no celular, precisa estar hospedado (internet). Localmente funciona só no seu PC.</p>
       </div>
-
-      <div class="helper">
-        Ao gerar o ZIP, o <b>love.html</b> vai ler a lista de mídias em <span style="font-family:var(--mono)">/media/manifest.json</span>.
-      </div>
-
-      <div class="hero-actions" style="margin-top:14px;">
-        <button class="btn primary" id="btnBundle" type="button">Gerar ZIP com mídias</button>
-        <button class="btn" id="btnPublish" type="button">Publicar online (GitHub + Netlify)</button>
-        <span class="small" id="bundleStatus"></span>
-        <span class="small" id="publishStatus"></span>
-      </div>
-
-      <div class="danger" style="display:block; margin-top:12px;">
-        ⚠️ QR não carrega arquivos do seu PC direto. O ZIP é para <b>hospedar</b> e então abrir no celular.
+      <div class="card">
+        <h2>Dá pra personalizar?</h2>
+        <p>Sim: cores, textos, layout da página final e até música (posso te ajudar a colocar).</p>
       </div>
     </section>
 
-    <footer>Feito com ❤️ — v5 (layout v2 + correções v4).</footer>
+    <footer>
+      Feito com ❤️ — personalize do seu jeito.
+    </footer>
   </main>
 
-  <!-- QRCode.js + JSZip -->
+  <!-- QRCode.js (CDN) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
   <script>
-    // floating hearts background
+    // ---- floating hearts background
     (function spawnHearts(){
       const box = document.getElementById('hearts');
       const count = 18;
@@ -560,67 +566,47 @@ https://site.com/foto2.png" style="min-height:92px;"></textarea>
       }
     })();
 
-    // Elements
+    // ---- QR generator
     const elTo = document.getElementById('toName');
     const elFrom = document.getElementById('fromName');
     const elMsg = document.getElementById('message');
-    const elPhotos = document.getElementById('photoUrls');
-    const elMusic = document.getElementById('musicUrl');
-    const elVideo = document.getElementById('videoUrl');
-    const elAuto = document.getElementById('autoplayMusic');
-    const elLoop = document.getElementById('loopMusic');
     const elBase = document.getElementById('baseUrl');
-    const elBundle = document.getElementById('useBundle');
-    const elLockCreated = document.getElementById('lockCreated');
-
     const btnGen = document.getElementById('btnGenerate');
     const btnCopy = document.getElementById('btnCopy');
     const btnDl = document.getElementById('btnDownload');
     const outUrl = document.getElementById('outUrl');
     const qrNode = document.getElementById('qrcode');
-    const errBox = document.getElementById('errBox');
 
     let lastLink = "";
-    let createdTs = null; // timestamp (ms) do momento que você gerou o QR
-    let lockCreated = false;
 
-    function sanitize(str){ return (str || "").trim(); }
-    function showErr(msg){ errBox.style.display="block"; errBox.textContent = msg; }
-    function clearErr(){ errBox.style.display="none"; errBox.textContent = ""; }
+    function sanitize(str){
+      return (str || "").trim();
+    }
 
     function buildLink(){
       const to = encodeURIComponent(sanitize(elTo.value));
       const from = encodeURIComponent(sanitize(elFrom.value));
       const msg = encodeURIComponent(sanitize(elMsg.value));
 
-      const photosRaw = sanitize(elPhotos.value);
-      const photosList = photosRaw ? photosRaw.split(/\r?\n/).map(s=>s.trim()).filter(Boolean).slice(0,12) : [];
-      const photos = photosList.length ? encodeURIComponent(photosList.join(",")) : "";
-
-      const musicVal = sanitize(elMusic.value);
-      const videoVal = sanitize(elVideo.value);
-      const music = musicVal ? encodeURIComponent(musicVal) : "";
-      const video = videoVal ? encodeURIComponent(videoVal) : "";
-
-      const auto = elAuto.checked ? "1" : "0";
-      const loop = elLoop.checked ? "1" : "0";
-      const bundle = elBundle.checked ? "1" : "0";
-      const created = (createdTs ?? Date.now()).toString();
-
+      // base url: if blank -> relative
       let base = sanitize(elBase.value);
+      // remove trailing slash
       if(base.endsWith('/')) base = base.slice(0,-1);
 
-      let qs = `?to=${to}&from=${from}&msg=${msg}&auto=${auto}&loop=${loop}&created=${created}`;
-      if(photos) qs += `&photos=${photos}`;
-      if(music) qs += `&music=${music}`;
-      if(video) qs += `&video=${video}`;
-      if(bundle === "1") qs += `&bundle=1`;
-
       const path = "/love.html";
-      return base ? (base + path + qs) : ("." + path + qs);
+      const qs = `?to=${to}&from=${from}&msg=${msg}`;
+
+      if(base){
+        return base + path + qs;
+      }
+      // relative (works when hosted too, but QR scanning depends on where it's served)
+      return "." + path + qs;
     }
 
-    function clearQr(){ while(qrNode.firstChild) qrNode.removeChild(qrNode.firstChild); }
+    function clearQr(){
+      while(qrNode.firstChild) qrNode.removeChild(qrNode.firstChild);
+    }
+
     function renderQr(text){
       clearQr();
       new QRCode(qrNode, {
@@ -642,7 +628,14 @@ https://site.com/foto2.png" style="min-height:92px;"></textarea>
     async function downloadPng(){
       const node = getQrCanvasOrImg();
       if(!node) return alert("Gere o QR primeiro.");
-      const dataUrl = node.tagName.toLowerCase() === 'canvas' ? node.toDataURL("image/png") : node.src;
+
+      let dataUrl = "";
+      if(node.tagName.toLowerCase() === 'canvas'){
+        dataUrl = node.toDataURL("image/png");
+      }else{
+        dataUrl = node.src;
+      }
+
       const a = document.createElement('a');
       a.href = dataUrl;
       a.download = "qr-romantico.png";
@@ -663,249 +656,25 @@ https://site.com/foto2.png" style="min-height:92px;"></textarea>
     }
 
     function generate(){
-      clearErr();
-      try{
-        const to = sanitize(elTo.value);
-        const from = sanitize(elFrom.value);
-        const msg = sanitize(elMsg.value);
+      const to = sanitize(elTo.value);
+      const from = sanitize(elFrom.value);
+      const msg = sanitize(elMsg.value);
 
-        if(!to || !from || !msg){
-          alert("Preencha: Para, De e Mensagem 🙂");
-          return;
-        }
-
-        lockCreated = elLockCreated && elLockCreated.checked;
-        if(!lockCreated || !createdTs){ createdTs = Date.now(); }
-        lastLink = buildLink();
-
-        if(lastLink.length > 2000){
-          showErr("Seu link ficou muito grande (muitas fotos/URLs longas). Tente menos fotos ou URLs mais curtas.");
-        }
-
-        outUrl.textContent = lastLink;
-        renderQr(lastLink);
-      }catch(e){
-        showErr("Erro ao gerar: " + (e && e.message ? e.message : String(e)));
+      if(!to || !from || !msg){
+        alert("Preencha: Para, De e Mensagem 🙂");
+        return;
       }
+
+      lastLink = buildLink();
+      outUrl.textContent = lastLink;
+      renderQr(lastLink);
     }
 
     btnGen.addEventListener('click', generate);
     btnCopy.addEventListener('click', copyLink);
     btnDl.addEventListener('click', downloadPng);
 
-    // ---- Local ZIP bundling
-    const localPhotos = document.getElementById("localPhotos");
-    const localMusic = document.getElementById("localMusic");
-    const localVideo = document.getElementById("localVideo");
-    const zipName = document.getElementById("zipName");
-    const btnBundle = document.getElementById("btnBundle");
-    const bundleStatus = document.getElementById("bundleStatus");
-    const btnPublish = document.getElementById("btnPublish");
-    const publishStatus = document.getElementById("publishStatus");
-
-    function safeName(name){
-      return (name || "arquivo").replace(/[^a-zA-Z0-9._-]/g, "_");
-    }
-    async function fileToArrayBuffer(file){ return await file.arrayBuffer(); }
-    async function downloadBlob(filename, blob){
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(()=> URL.revokeObjectURL(url), 1500);
-    }
-
-    btnBundle.addEventListener("click", async ()=>{
-      bundleStatus.textContent = "";
-      clearErr();
-
-      const to = sanitize(elTo.value);
-      const from = sanitize(elFrom.value);
-      const msg = sanitize(elMsg.value);
-      if(!to || !from || !msg) return alert("Preencha Para/De/Mensagem antes 🙂");
-
-      try{
-        const zip = new JSZip();
-        // include the project files by fetching them (works when opened from http/https; for file:// may fail in some browsers)
-        // fallback: embed minimal love.html if fetch fails
-        let loveText = "";
-        try{ loveText = await fetch("./love.html", {cache:"no-store"}).then(r=>r.text()); }catch(e){ loveText = ""; }
-        if(!loveText || loveText.length < 1000){
-          // minimal fallback will be replaced once hosted; but keep it functional
-          loveText = `<!doctype html><html><body style="font-family:Arial;background:#07070a;color:#fff;padding:20px">Abra este site hospedado no Netlify para ver a versão completa ❤️</body></html>`;
-        }
-        zip.file("index.html", document.documentElement.outerHTML);
-        zip.file("love.html", loveText);
-
-        const media = zip.folder("media");
-        const manifest = { photos: [], music: null, video: null, autoplay: elAuto.checked ? 1 : 0, loop: elLoop.checked ? 1 : 0 };
-
-        const photos = Array.from(localPhotos.files || []).slice(0, 12);
-        for(const f of photos){
-          const fname = "photo_" + Date.now() + "_" + safeName(f.name);
-          media.file(fname, await fileToArrayBuffer(f));
-          manifest.photos.push("media/" + fname);
-        }
-
-        const m = (localMusic.files && localMusic.files[0]) ? localMusic.files[0] : null;
-        if(m){
-          const fname = "music_" + Date.now() + "_" + safeName(m.name);
-          media.file(fname, await fileToArrayBuffer(m));
-          manifest.music = "media/" + fname;
-        }
-
-        const v = (localVideo.files && localVideo.files[0]) ? localVideo.files[0] : null;
-        if(v){
-          const fname = "video_" + Date.now() + "_" + safeName(v.name);
-          media.file(fname, await fileToArrayBuffer(v));
-          manifest.video = "media/" + fname;
-        }
-
-        media.file("manifest.json", JSON.stringify(manifest, null, 2));
-        zip.file("BUNDLE-INFO.txt", "Depois de hospedar no Netlify, gere o QR marcando 'Usar mídias do ZIP (bundle)'.");
-
-        bundleStatus.textContent = "Gerando ZIP...";
-        const blob = await zip.generateAsync({type:"blob"});
-        const name = safeName(zipName.value) || "qr-romantico-bundle.zip";
-        await downloadBlob(name.endsWith(".zip") ? name : (name + ".zip"), blob);
-        bundleStatus.textContent = "ZIP baixado ✅ (agora suba no Netlify)";
-      }catch(e){
-        showErr("Erro ao gerar ZIP: " + (e && e.message ? e.message : String(e)));
-      }
-    });
-
-
-    // ---- Publicar online (GitHub via Netlify Function)
-    async function fileToBase64(file){
-      const buf = await file.arrayBuffer();
-      let binary = "";
-      const bytes = new Uint8Array(buf);
-      const chunkSize = 0x8000;
-      for(let i=0;i<bytes.length;i+=chunkSize){
-        binary += String.fromCharCode(...bytes.subarray(i, i+chunkSize));
-      }
-      return btoa(binary);
-    }
-
-    function jsonToBase64(obj){
-      const s = JSON.stringify(obj, null, 2);
-      return btoa(unescape(encodeURIComponent(s)));
-    }
-
-    async function publishFiles(files, message){
-      const res = await fetch("/.netlify/functions/publish", {
-        method: "POST",
-        headers: {"content-type":"application/json"},
-        body: JSON.stringify({ files, message })
-      });
-      const txt = await res.text();
-      let data;
-      try{ data = JSON.parse(txt); }catch{ data = { raw: txt }; }
-      if(!res.ok || (data && data.error)){
-        throw new Error((data && data.error) ? data.error : ("HTTP " + res.status + ": " + txt));
-      }
-      return data;
-    }
-
-    async function publishOnline(){
-      publishStatus.textContent = "";
-      clearErr();
-
-      const to = sanitize(elTo.value);
-      const from = sanitize(elFrom.value);
-      const msg = sanitize(elMsg.value);
-      if(!to || !from || !msg) return alert("Preencha Para/De/Mensagem antes 🙂");
-
-      const photos = Array.from(localPhotos.files || []).slice(0, 12);
-      const m = (localMusic.files && localMusic.files[0]) ? localMusic.files[0] : null;
-      const v = (localVideo.files && localVideo.files[0]) ? localVideo.files[0] : null;
-
-      // Limites práticos (GitHub/Netlify): evitar arquivos muito grandes
-      const maxPhoto = 8 * 1024 * 1024;   // 8MB por foto
-      const maxMusic = 20 * 1024 * 1024;  // 20MB música
-      const maxVideo = 25 * 1024 * 1024;  // 25MB vídeo (recomendado usar URL se maior)
-
-      for(const f of photos){
-        if(f.size > maxPhoto){
-          return alert("Uma das fotos é muito grande (>8MB). Tente uma versão menor, ou menos fotos.");
-        }
-      }
-      if(m && m.size > maxMusic){
-        return alert("A música é muito grande (>20MB). Tente um mp3 menor.");
-      }
-      if(v && v.size > maxVideo){
-        return alert("O vídeo é grande demais para publicar automático. Recomendo usar URL (YouTube/Drive).");
-      }
-
-      publishStatus.textContent = "Preparando arquivos…";
-
-      const filesToSend = [];
-      const manifest = { photos: [], music: null, video: null, autoplay: elAuto.checked ? 1 : 0, loop: elLoop.checked ? 1 : 0 };
-
-      // Fotos
-      for(const f of photos){
-        const fname = "photo_" + Date.now() + "_" + safeName(f.name);
-        const path = "media/" + fname;
-        filesToSend.push({ path, content_base64: await fileToBase64(f) });
-        manifest.photos.push(path);
-      }
-
-      // Música
-      if(m){
-        const fname = "music_" + Date.now() + "_" + safeName(m.name);
-        const path = "media/" + fname;
-        filesToSend.push({ path, content_base64: await fileToBase64(m) });
-        manifest.music = path;
-      }
-
-      // Vídeo (opcional)
-      if(v){
-        const fname = "video_" + Date.now() + "_" + safeName(v.name);
-        const path = "media/" + fname;
-        filesToSend.push({ path, content_base64: await fileToBase64(v) });
-        manifest.video = path;
-      }
-
-      // Manifest
-      filesToSend.push({ path: "media/manifest.json", content_base64: jsonToBase64(manifest) });
-
-      publishStatus.textContent = "Publicando… (isso pode levar alguns segundos)";
-      await publishFiles(filesToSend, "Atualiza presente (media) — " + new Date().toLocaleString("pt-BR"));
-
-      publishStatus.textContent = "Publicado ✅ Agora o Netlify vai atualizar sozinho.";
-
-      // Marcar bundle automaticamente e gerar QR com URL do site
-      elBundle.checked = true;
-
-      if(!sanitize(elBase.value)){
-        elBase.value = window.location.origin;
-      }
-
-      // Fixar momento do QR para não resetar sem querer
-      if(elLockCreated) elLockCreated.checked = true;
-
-      // Gera um novo QR com created do momento atual
-      createdTs = Date.now();
-      lastLink = buildLink();
-      outUrl.textContent = lastLink;
-      renderQr(lastLink);
-
-      alert("Publicado! Aguarde ~20–60s pro Netlify atualizar, depois teste o QR no celular.");
-    }
-
-    if(btnPublish){
-      btnPublish.addEventListener("click", async ()=>{
-        btnPublish.disabled = true;
-        try{ await publishOnline(); }
-        catch(e){ showErr("Erro ao publicar: " + (e && e.message ? e.message : String(e))); }
-        finally{ btnPublish.disabled = false; }
-      });
-    }
-
-    // demo
+    // default demo text
     elTo.value = "Júlia";
     elFrom.value = "Pedro";
     elMsg.value = "Eu te amo mais do que consigo explicar. Obrigado(a) por existir. 💖";
