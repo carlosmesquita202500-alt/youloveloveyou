@@ -271,24 +271,30 @@ function addPanel(title, contentEl){
     }
 
     async function renderMedia({photosParam, musicUrl, videoUrl, auto, loop}){
-      // Photos
-      if(photosParam){
-        const urls = photosParam.split(",").map(s=>s.trim()).filter(Boolean).slice(0,12);
-        if(urls.length){
-          const wrap = document.createElement("div");
-          wrap.className = "photos";
-          urls.forEach(u=>{
-            const img = document.createElement("img");
-            img.loading = "lazy";
-            img.alt = "Foto";
-            img.src = u;
-            img.style.cursor = "zoom-in";
-            img.addEventListener("click", ()=> openLightbox(u));
-            wrap.appendChild(img);
-          });
-          addPanel("📸 Nossas fotos", wrap);
+      // Normalize photos: accept comma or newline
+      const rawPhotos = (photosParam || "").trim();
+      const urls = rawPhotos
+        ? rawPhotos.split(/?
+|,/).map(s=>s.trim()).filter(Boolean).slice(0,12)
+        : [];
 
-          const bg = document.getElementById("bgPhoto");
+      // Photos
+      if(urls.length){
+        const wrap = document.createElement("div");
+        wrap.className = "photos";
+        urls.forEach(u=>{
+          const img = document.createElement("img");
+          img.loading = "lazy";
+          img.alt = "Foto";
+          img.src = u;
+          img.style.cursor = "zoom-in";
+          img.addEventListener("click", ()=> openLightbox(u));
+          wrap.appendChild(img);
+        });
+        addPanel("📸 Nossas fotos", wrap);
+
+        const bg = document.getElementById("bgPhoto");
+        if(bg){
           bg.style.backgroundImage = `url('${urls[0].replace(/'/g, "%27")}')`;
           bg.style.display = "block";
         }
@@ -296,64 +302,122 @@ function addPanel(title, contentEl){
 
       // Music
       const playBtn = document.getElementById("playBtn");
+      const tapHint = document.getElementById("tapHint");
+
+      function showHint(txt){
+        if(tapHint){
+          tapHint.textContent = txt || "Toque em qualquer lugar para tocar a música 🎵";
+          tapHint.classList.add("show");
+        }
+      }
+      function hideHint(){ if(tapHint) tapHint.classList.remove("show"); }
+
       if(musicUrl){
         const wrap = document.createElement("div");
-        const audioEl = document.createElement("audio");
-        audioEl.controls = true;
-        audioEl.src = musicUrl;
-        audioEl.preload = "none";
-        if(loop) audioEl.loop = true;
 
-        const hint = document.createElement("div");
-        hint.className = "playHint";
-        hint.textContent = "Se não tocar sozinho, toque no botão “Tocar música” (alguns celulares bloqueiam autoplay).";
-
-        wrap.appendChild(audioEl);
-        wrap.appendChild(hint);
-        addPanel("🎵 Música", wrap);
-
-        
-        // Start music on first interaction anywhere (no button)
-        try{ playBtn.style.display = "none"; }catch(e){}
-
-        const tapHint = document.getElementById("tapHint");
-        function showHint(){ if(tapHint) tapHint.classList.add("show"); }
-        function hideHint(){ if(tapHint) tapHint.classList.remove("show"); }
-
-        // expose audio globally so we can start on first touch/click
-        window.__loveAudio = audioEl;
-
-        async function tryPlay(){
-          if(!window.__loveAudio) return;
+        if(isYouTube(musicUrl)){
+          // YouTube "music" (embed)
+          const iframe = document.createElement("iframe");
+          iframe.title = "Música (YouTube)";
+          const emb = youtubeEmbed(musicUrl);
+          // Extract video id for loop
+          let vid = "";
           try{
-            await window.__loveAudio.play();
-            hideHint();
-            removeListeners();
-          }catch(e){
+            const u = new URL(emb);
+            if(u.pathname.includes("/embed/")){
+              vid = u.pathname.split("/embed/")[1].split(/[?&#]/)[0] || "";
+            }
+          }catch{}
+          const params = new URLSearchParams();
+          params.set("rel","0");
+          params.set("modestbranding","1");
+          params.set("playsinline","1");
+          params.set("enablejsapi","0");
+          if(auto){
+            // Autoplay is often blocked unless muted; we attempt muted autoplay for best chance
+            params.set("autoplay","1");
+            params.set("mute","1");
+          }
+          if(loop){
+            params.set("loop","1");
+            if(vid) params.set("playlist", vid);
+          }
+          iframe.src = emb + (emb.includes("?") ? "&" : "?") + params.toString();
+          iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+          iframe.allowFullscreen = true  # keep python happy
+          iframe.style.width = "100%";
+          iframe.style.aspectRatio = "16 / 9";
+          iframe.style.borderRadius = "14px";
+          iframe.style.border = "1px solid rgba(255,255,255,.10)";
+          iframe.style.background = "#000";
+          wrap.appendChild(iframe);
+
+          const hint = document.createElement("div");
+          hint.className = "playHint";
+          hint.textContent = auto
+            ? "Se não tocar sozinho, toque no player do YouTube (alguns celulares bloqueiam autoplay)."
+            : "Toque no player do YouTube para tocar a música.";
+          wrap.appendChild(hint);
+
+          addPanel("🎵 Música (YouTube)", wrap);
+
+          // We can't reliably start YouTube from a tap anywhere without JS API.
+          // So we just show a helpful hint.
+          if(auto){
+            showHint("Se a música não iniciar sozinha, toque no player do YouTube 🎵");
+            setTimeout(()=> hideHint(), 2200);
+          }else{
+            showHint("Toque no player do YouTube para tocar a música 🎵");
+          }
+          try{ playBtn.style.display = "none"; }catch(e){}
+        }else{
+          // Direct audio file
+          const audioEl = document.createElement("audio");
+          audioEl.controls = true;
+          audioEl.src = musicUrl;
+          audioEl.preload = "none";
+          if(loop) audioEl.loop = true;
+
+          const hint = document.createElement("div");
+          hint.className = "playHint";
+          hint.textContent = "Se não tocar sozinho, toque na tela (alguns celulares bloqueiam autoplay).";
+
+          wrap.appendChild(audioEl);
+          wrap.appendChild(hint);
+          addPanel("🎵 Música", wrap);
+
+          // Start music on first interaction anywhere (no button)
+          try{ playBtn.style.display = "none"; }catch(e){}
+
+          window.__loveAudio = audioEl;
+
+          async function tryPlay(){
+            if(!window.__loveAudio) return;
+            try{
+              await window.__loveAudio.play();
+              hideHint();
+              removeListeners();
+            }catch(e){
+              showHint();
+            }
+          }
+
+          function onFirstInteract(){ tryPlay(); }
+          function removeListeners(){
+            window.removeEventListener("pointerdown", onFirstInteract, true);
+            window.removeEventListener("touchstart", onFirstInteract, true);
+            window.removeEventListener("click", onFirstInteract, true);
+          }
+
+          window.addEventListener("pointerdown", onFirstInteract, true);
+          window.addEventListener("touchstart", onFirstInteract, true);
+          window.addEventListener("click", onFirstInteract, true);
+
+          if(auto){
+            setTimeout(()=>{ tryPlay(); }, 350);
+          }else{
             showHint();
           }
-        }
-
-        function onFirstInteract(){ tryPlay(); }
-
-        function removeListeners(){
-          window.removeEventListener("pointerdown", onFirstInteract, true);
-          window.removeEventListener("touchstart", onFirstInteract, true);
-          window.removeEventListener("click", onFirstInteract, true);
-        }
-
-        // capture first interaction anywhere on page
-        window.addEventListener("pointerdown", onFirstInteract, true);
-        window.addEventListener("touchstart", onFirstInteract, true);
-        window.addEventListener("click", onFirstInteract, true);
-
-        if(auto){
-          setTimeout(()=>{ tryPlay(); }, 350);
-        }else{
-          showHint();
-        }
-catch(e){}
-          }, 300);
         }
       }
 
@@ -395,7 +459,13 @@ catch(e){}
         const res = await fetch("./media/manifest.json", {cache:"no-store"});
         if(!res.ok) throw new Error("manifest.json não encontrado");
         const m = await res.json();
+        const hasAny = (Array.isArray(m.photos) && m.photos.length) || m.music || m.video;
         const photosParam = (m.photos || []).join(",");
+        if(!hasAny){
+          // fallback: usa parâmetros do link (URLs) se o bundle estiver vazio
+          await renderFromParams();
+          return;
+        }
         await renderMedia({
           photosParam,
           musicUrl: m.music || "",

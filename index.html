@@ -748,6 +748,24 @@ https://...
     const btnPublish = document.getElementById("btnPublish");
     const publishStatus = document.getElementById("publishStatus");
 
+    function syncMediaMode(){
+      if(!elUseUrls || !elBundle) return;
+      // If both checked, prefer the last changed one (handled in listeners)
+      if(elUseUrls.checked && elBundle.checked){
+        // default: keep URLs, turn off bundle
+        elBundle.checked = false;
+      }
+    }
+    // Mutual exclusivity
+    elUseUrls?.addEventListener("change", ()=>{
+      if(elUseUrls.checked && elBundle) elBundle.checked = false;
+    });
+    elBundle?.addEventListener("change", ()=>{
+      if(elBundle.checked && elUseUrls) elUseUrls.checked = false;
+    });
+    syncMediaMode();
+
+
 
     let lastLink = "";
 
@@ -873,7 +891,10 @@ https://...
       const auto = (elAuto && elAuto.checked) ? "1" : "0";
       const loop = (elLoop && elLoop.checked) ? "1" : "0";
       const bundle = (elBundle && elBundle.checked) ? "1" : "0";
-      const useUrls = (elUseUrls && elUseUrls.checked) ? "1" : "0";
+
+      // Se bundle estiver ligado, desliga URLs pra evitar link confuso
+      let useUrls = (elUseUrls && elUseUrls.checked) ? "1" : "0";
+      if(bundle === "1") useUrls = "0";
 
       const lock = (elLockCreated && elLockCreated.checked);
       if(!lock || !createdTs){ createdTs = Date.now(); }
