@@ -387,6 +387,72 @@
       .genWrap{ grid-template-columns: 1fr; }
       .navlinks{ display:none; }
     }
+  
+    /* --- publish progress + toast --- */
+    @keyframes shimmerMove{ 0%{ transform: translateX(-60%);} 100%{ transform: translateX(60%);} }
+    @keyframes heartPulse{
+      0%{ transform: rotate(45deg) scale(1); }
+      35%{ transform: rotate(45deg) scale(1.25); }
+      70%{ transform: rotate(45deg) scale(1); }
+      100%{ transform: rotate(45deg) scale(1); }
+    }
+    .toastHost{
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 10000;
+      display: grid;
+      gap: 10px;
+      max-width: min(520px, calc(100vw - 36px));
+      pointer-events: none;
+    }
+    .toast{
+      pointer-events: auto;
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(15,15,22,.92);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 24px 70px rgba(0,0,0,.55);
+      padding: 12px 14px;
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      transform: translateY(10px);
+      opacity: 0;
+      animation: toastIn .22s ease forwards;
+    }
+    .toast .tIcon{
+      width: 34px; height: 34px;
+      border-radius: 14px;
+      display:grid; place-items:center;
+      flex: 0 0 auto;
+      background: linear-gradient(135deg, rgba(255,42,85,.95), rgba(255,61,122,.85));
+      box-shadow: 0 16px 40px rgba(255,42,85,.22);
+      border:1px solid rgba(255,255,255,.14);
+    }
+    .toast .tTitle{ font-weight: 1000; margin:0; line-height:1.2; }
+    .toast .tMsg{ margin-top: 3px; color: rgba(185,185,198,.92); font-size: 13px; line-height:1.35; }
+    .toast .tClose{
+      margin-left:auto;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      color: rgba(243,243,246,.92);
+      border-radius: 12px;
+      padding: 6px 10px;
+      font-weight: 900;
+      cursor:pointer;
+    }
+    .toast.info .tIcon{ background: linear-gradient(135deg, rgba(255,204,102,.95), rgba(255,122,162,.85)); }
+    .toast.ok .tIcon{ background: linear-gradient(135deg, rgba(80,255,180,.85), rgba(255,61,122,.75)); }
+    .toast.err .tIcon{ background: linear-gradient(135deg, rgba(255,42,85,.95), rgba(255,42,85,.55)); }
+    @keyframes toastIn{ to{ transform: translateY(0); opacity: 1; } }
+    @keyframes toastOut{ to{ transform: translateY(10px); opacity: 0; } }
+
+    .small{ font-size:12px; color: rgba(185,185,198,.92); line-height:1.45; }
+    .chips{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:10px;}
+    .chips label{ margin:0; display:inline-flex; align-items:center; gap:8px; font-weight:800; color: rgba(243,243,246,.92); }
+    .chips input[type="checkbox"]{ width:auto; }
+    
   </style>
 </head>
 <body>
@@ -523,6 +589,93 @@
       </div>
     </section>
 
+    
+    <section id="midias" class="card" style="margin-top:16px;">
+      <h2>Mídias (fotos, música e vídeo)</h2>
+      <p>Escolha como você quer adicionar mídias na página final:</p>
+
+      <div class="grid" style="margin-top:14px;">
+        <div class="card" style="box-shadow:none; background: rgba(0,0,0,.18);">
+          <h2 style="margin-top:0;">Opção 1: por URL</h2>
+          <p class="small">Use se suas fotos/música/vídeo já estão online (Drive público, Imgur, YouTube, etc.).</p>
+
+          <label for="photoUrls">Links das fotos (1 por linha)</label>
+          <textarea id="photoUrls" placeholder="https://...
+https://...
+"></textarea>
+
+          <label for="musicUrl">URL da música (MP3)</label>
+          <input id="musicUrl" placeholder="https://.../musica.mp3" />
+
+          <label for="videoUrl">URL do vídeo (opcional)</label>
+          <input id="videoUrl" placeholder="https://... (YouTube/MP4)" />
+
+          <div class="small" style="margin-top:10px;">
+            Ao gerar o QR, marque “Usar URLs” e ele vai abrir a página com essas mídias.
+          </div>
+        </div>
+
+        <div class="card" style="box-shadow:none; background: rgba(0,0,0,.18);">
+          <h2 style="margin-top:0;">Opção 2: arquivos locais (100% online)</h2>
+          <p class="small">Selecione arquivos do seu PC/celular e clique em <b>Publicar</b>. Ele envia pro GitHub via Netlify Function e o Netlify publica automaticamente. Sem baixar ZIP, sem Windows bloquear.</p>
+
+          <label for="localPhotos">Fotos (até 12)</label>
+          <input id="localPhotos" type="file" accept="image/*" multiple />
+
+          <label for="localMusic">Música (MP3)</label>
+          <input id="localMusic" type="file" accept="audio/*" />
+
+          <label for="localVideo">Vídeo (opcional)</label>
+          <input id="localVideo" type="file" accept="video/*" />
+
+          <div class="small" style="margin-top:10px;">
+            Dica: vídeos grandes podem falhar por limite de tamanho. Se for longo, use a Opção 1 (URL do YouTube/Drive).
+          </div>
+
+          <div class="hero-actions" style="margin-top:12px;">
+            <button class="btn primary" id="btnPublish" type="button">Publicar (GitHub + Netlify)</button>
+          </div>
+
+          <div style="margin-top:10px; max-width:520px;">
+            <div id="publishProgressContainer" style="display:none;">
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px;">
+                <div id="publishProgressLabel" style="font-weight:900; color:rgba(243,243,246,.92);">Preparando seu momento… 💘</div>
+                <div id="publishProgressPct" style="font-weight:900; font-family:var(--mono); color:rgba(243,243,246,.92);">0%</div>
+              </div>
+
+              <div style="position:relative; background:rgba(255,255,255,.10); border-radius:999px; overflow:hidden; height:12px; border:1px solid rgba(255,255,255,.14);">
+                <div id="publishProgress" style="width:0%; height:100%; background:linear-gradient(90deg,#ff2a55,#ff3d7a,#ff7aa2); transition:width .35s ease;"></div>
+                <div id="publishProgressShimmer" style="position:absolute; inset:0; transform:translateX(-60%); opacity:.65; background:linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);"></div>
+              </div>
+
+              <div id="publishLoader" style="display:flex; align-items:center; gap:10px; margin-top:10px;">
+                <div id="pulseHeart" aria-hidden="true" style="width:18px; height:18px; transform:rotate(45deg); background:#ff2a55; border-radius:3px; position:relative; filter:drop-shadow(0 10px 22px rgba(255,42,85,.25));">
+                  <span style="content:''; position:absolute; width:18px; height:18px; background:inherit; border-radius:50%; left:-9px; top:0;"></span>
+                  <span style="content:''; position:absolute; width:18px; height:18px; background:inherit; border-radius:50%; left:0; top:-9px;"></span>
+                </div>
+                <div class="small" id="publishCinematicLine" style="color:rgba(185,185,198,.92);">Só um instante…</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="small" id="publishStatus" style="margin-top:8px;"></div>
+        </div>
+      </div>
+
+      <div class="chips">
+        <label><input type="checkbox" id="useUrls" /> Usar URLs</label>
+        <label><input type="checkbox" id="useBundle" checked /> Usar arquivos publicados (bundle)</label>
+        <label><input type="checkbox" id="autoplayMusic" /> Tocar música automaticamente</label>
+        <label><input type="checkbox" id="loopMusic" checked /> Repetir música</label>
+        <label><input type="checkbox" id="lockCreated" /> Fixar “momento do QR”</label>
+      </div>
+
+      <div class="small" style="margin-top:10px;">
+        Importante: se você usar “bundle”, a página final busca as mídias em <span style="font-family:var(--mono)">/media/manifest.json</span>.
+      </div>
+    </section>
+
+
     <section id="faq" class="grid">
       <div class="card">
         <h2>Funciona sem internet?</h2>
@@ -577,7 +730,130 @@
     const outUrl = document.getElementById('outUrl');
     const qrNode = document.getElementById('qrcode');
 
+    // ---- mídias
+    const elUseUrls = document.getElementById("useUrls");
+    const elBundle = document.getElementById("useBundle");
+    const elAuto = document.getElementById("autoplayMusic");
+    const elLoop = document.getElementById("loopMusic");
+    const elLockCreated = document.getElementById("lockCreated");
+
+    const elPhotoUrls = document.getElementById("photoUrls");
+    const elMusicUrl = document.getElementById("musicUrl");
+    const elVideoUrl = document.getElementById("videoUrl");
+
+    const localPhotosEl = document.getElementById("localPhotos");
+    const localMusicEl  = document.getElementById("localMusic");
+    const localVideoEl  = document.getElementById("localVideo");
+
+    const btnPublish = document.getElementById("btnPublish");
+    const publishStatus = document.getElementById("publishStatus");
+
+
     let lastLink = "";
+
+    let createdTs = null;
+
+    // ---- toast
+    function showToast(type, title, msg, ttlMs=5200){
+      const host = document.getElementById("toastHost");
+      if(!host) return;
+
+      const t = document.createElement("div");
+      t.className = "toast " + (type || "info");
+
+      const icon = document.createElement("div");
+      icon.className = "tIcon";
+      icon.innerHTML = type === "ok" ? "✅" : (type === "err" ? "⚠️" : "✨");
+
+      const box = document.createElement("div");
+      const h = document.createElement("div");
+      h.className = "tTitle";
+      h.textContent = title || "Aviso";
+      const p = document.createElement("div");
+      p.className = "tMsg";
+      p.textContent = msg || "";
+      box.appendChild(h);
+      box.appendChild(p);
+
+      const close = document.createElement("button");
+      close.className = "tClose";
+      close.type = "button";
+      close.textContent = "Fechar";
+
+      function dismiss(){
+        try{ clearTimeout(t._toastTimer); }catch(e){}
+        t.style.animation = "toastOut .22s ease forwards";
+        setTimeout(()=>{ try{ t.remove(); }catch(e){} }, 220);
+      }
+      close.addEventListener("click", dismiss);
+
+      t.appendChild(icon);
+      t.appendChild(box);
+      t.appendChild(close);
+      host.appendChild(t);
+
+      t._toastTimer = setTimeout(dismiss, ttlMs);
+    }
+
+    // ---- progress
+    function updatePublishProgress(percent, label){
+      const container = document.getElementById("publishProgressContainer");
+      const bar = document.getElementById("publishProgress");
+      const pct = document.getElementById("publishProgressPct");
+      const lbl = document.getElementById("publishProgressLabel");
+      const shimmer = document.getElementById("publishProgressShimmer");
+      const heart = document.getElementById("pulseHeart");
+
+      if(container) container.style.display = "block";
+      const p = Math.max(0, Math.min(100, Math.round(percent)));
+      if(bar) bar.style.width = p + "%";
+      if(pct) pct.textContent = p + "%";
+      if(lbl && label) lbl.textContent = label;
+
+      if(shimmer) shimmer.style.animation = "shimmerMove 1.2s linear infinite";
+      if(heart) heart.style.animation = "heartPulse .9s ease-in-out infinite";
+    }
+
+    function resetPublishProgress(){
+      const container = document.getElementById("publishProgressContainer");
+      const bar = document.getElementById("publishProgress");
+      const pct = document.getElementById("publishProgressPct");
+      const shimmer = document.getElementById("publishProgressShimmer");
+      const heart = document.getElementById("pulseHeart");
+      const line = document.getElementById("publishCinematicLine");
+
+      if(bar) bar.style.width = "0%";
+      if(pct) pct.textContent = "0%";
+      if(shimmer) shimmer.style.animation = "none";
+      if(heart) heart.style.animation = "none";
+      if(line) line.textContent = "";
+      if(container) container.style.display = "none";
+    }
+
+    let cinematicTimer = null;
+    function startCinematicLines(){
+      const line = document.getElementById("publishCinematicLine");
+      if(!line) return;
+      const lines = [
+        "Colocando as memórias no lugar certo… 📸",
+        "Afinando a trilha sonora… 🎵",
+        "Embalando tudo com carinho… 🎁",
+        "Quase lá… só mais um pouquinho 💞",
+        "Pronto pra surpreender ✨"
+      ];
+      let i = 0;
+      line.textContent = lines[0];
+      if(cinematicTimer) clearInterval(cinematicTimer);
+      cinematicTimer = setInterval(()=>{
+        i = (i + 1) % lines.length;
+        line.textContent = lines[i];
+      }, 1400);
+    }
+    function stopCinematicLines(){
+      if(cinematicTimer) clearInterval(cinematicTimer);
+      cinematicTimer = null;
+    }
+
 
     function sanitize(str){
       return (str || "").trim();
@@ -590,16 +866,32 @@
 
       // base url: if blank -> relative
       let base = sanitize(elBase.value);
-      // remove trailing slash
       if(base.endsWith('/')) base = base.slice(0,-1);
 
       const path = "/love.html";
-      const qs = `?to=${to}&from=${from}&msg=${msg}`;
+
+      const auto = (elAuto && elAuto.checked) ? "1" : "0";
+      const loop = (elLoop && elLoop.checked) ? "1" : "0";
+      const bundle = (elBundle && elBundle.checked) ? "1" : "0";
+      const useUrls = (elUseUrls && elUseUrls.checked) ? "1" : "0";
+
+      const lock = (elLockCreated && elLockCreated.checked);
+      if(!lock || !createdTs){ createdTs = Date.now(); }
+      const created = String(createdTs || Date.now());
+
+      let qs = `?to=${to}&from=${from}&msg=${msg}&auto=${auto}&loop=${loop}&bundle=${bundle}&created=${created}`;
+
+      if(useUrls){
+        const photos = encodeURIComponent((elPhotoUrls?.value || "").trim());
+        const music = encodeURIComponent((elMusicUrl?.value || "").trim());
+        const video = encodeURIComponent((elVideoUrl?.value || "").trim());
+        // compact params (love.html should understand these; if not, they are simply ignored)
+        qs += `&photos=${photos}&music=${music}&video=${video}`;
+      }
 
       if(base){
         return base + path + qs;
       }
-      // relative (works when hosted too, but QR scanning depends on where it's served)
       return "." + path + qs;
     }
 
@@ -668,16 +960,178 @@
       lastLink = buildLink();
       outUrl.textContent = lastLink;
       renderQr(lastLink);
+      showToast("ok","QR pronto!","Agora é só baixar o PNG ou copiar o link. 💘", 4200);
     }
 
     btnGen.addEventListener('click', generate);
     btnCopy.addEventListener('click', copyLink);
     btnDl.addEventListener('click', downloadPng);
 
+    
+    // ===== PUBLICAR ONLINE (GitHub via Netlify Function) =====
+    function safeName(name){
+      return (name || "arquivo").replace(/[^a-zA-Z0-9._-]/g, "_");
+    }
+
+    async function fileToBase64(file){
+      const buf = await file.arrayBuffer();
+      let binary = "";
+      const bytes = new Uint8Array(buf);
+      const chunkSize = 0x8000;
+      for(let i=0;i<bytes.length;i+=chunkSize){
+        binary += String.fromCharCode(...bytes.subarray(i, i+chunkSize));
+      }
+      return btoa(binary);
+    }
+
+    async function publishFiles(files, message){
+      const res = await fetch("/.netlify/functions/publish", {
+        method: "POST",
+        headers: { "content-type":"application/json" },
+        body: JSON.stringify({ files, message })
+      });
+      const text = await res.text();
+      let data;
+      try{ data = JSON.parse(text); } catch { data = { raw: text }; }
+      if(!res.ok || data?.error){
+        throw new Error(data?.error || `HTTP ${res.status}: ${text}`);
+      }
+      return data;
+    }
+
+    btnPublish?.addEventListener("click", async ()=>{
+      if(btnPublish.disabled) return;
+
+      // validate message fields
+      const to = sanitize(elTo.value);
+      const from = sanitize(elFrom.value);
+      const msg = sanitize(elMsg.value);
+      if(!to || !from || !msg){
+        alert("Preencha: Para, De e Mensagem 🙂");
+        return;
+      }
+
+      // ensure base url filled for best experience
+      if(elBase && !sanitize(elBase.value)){
+        elBase.value = location.origin;
+      }
+
+      // lock UI
+      btnPublish.disabled = true;
+      btnPublish.dataset.prevText = btnPublish.textContent;
+      btnPublish.textContent = "Publicando… 💘";
+      btnPublish.style.opacity = "0.65";
+      if(btnGen){ btnGen.disabled = true; btnGen.style.opacity = "0.7"; }
+
+      publishStatus.textContent = "";
+      resetPublishProgress();
+      updatePublishProgress(1, "Preparando seu momento… 💘");
+      startCinematicLines();
+      showToast("info","Publicando seu presente…","Vou enviar suas mídias pro GitHub e o Netlify vai atualizar automaticamente. 💘", 5200);
+
+      try{
+        const photos = Array.from(localPhotosEl?.files || []).slice(0, 12);
+        const music = localMusicEl?.files?.[0] || null;
+        const video = localVideoEl?.files?.[0] || null;
+
+        if(photos.length === 0 && !music && !video){
+          throw new Error("Selecione pelo menos 1 foto, ou uma música/vídeo.");
+        }
+
+        // soft limit for video
+        if(video && video.size > 25 * 1024 * 1024){
+          throw new Error("Seu vídeo está grande demais para publicar automático. Use URL (YouTube/Drive) na Opção 1.");
+        }
+
+        publishStatus.textContent = "Preparando arquivos…";
+        updatePublishProgress(10, "Separando suas fotos e música… 💞");
+
+        const filesToSend = [];
+        const manifest = {
+          photos: [],
+          music: null,
+          video: null,
+          autoplay: (elAuto && elAuto.checked) ? 1 : 0,
+          loop: (elLoop && elLoop.checked) ? 1 : 0,
+        };
+
+        let progressCount = 0;
+        const totalFiles = photos.length + (music?1:0) + (video?1:0) + 1;
+
+        for(const f of photos){
+          const filename = `photo_${Date.now()}_${safeName(f.name)}`;
+          const path = `media/${filename}`;
+          const b64 = await fileToBase64(f);
+          filesToSend.push({ path, content_base64: b64 });
+          manifest.photos.push(path);
+          progressCount++;
+          updatePublishProgress(10 + (progressCount/totalFiles)*40, "Empacotando suas memórias… 📸");
+        }
+
+        if(music){
+          const filename = `music_${Date.now()}_${safeName(music.name)}`;
+          const path = `media/${filename}`;
+          const b64 = await fileToBase64(music);
+          filesToSend.push({ path, content_base64: b64 });
+          manifest.music = path;
+          progressCount++;
+          updatePublishProgress(10 + (progressCount/totalFiles)*40, "Afinando a trilha sonora… 🎵");
+        }
+
+        if(video){
+          const filename = `video_${Date.now()}_${safeName(video.name)}`;
+          const path = `media/${filename}`;
+          const b64 = await fileToBase64(video);
+          filesToSend.push({ path, content_base64: b64 });
+          manifest.video = path;
+          progressCount++;
+          updatePublishProgress(10 + (progressCount/totalFiles)*40, "Preparando o vídeo… 🎬");
+        }
+
+        // manifest
+        const manifestStr = JSON.stringify(manifest, null, 2);
+        const manifestB64 = btoa(unescape(encodeURIComponent(manifestStr)));
+        filesToSend.push({ path: "media/manifest.json", content_base64: manifestB64 });
+        updatePublishProgress(60, "Enviando para o GitHub… 🚀");
+
+        publishStatus.textContent = "Publicando no GitHub…";
+        await publishFiles(filesToSend, `Atualiza presente (media) — ${new Date().toLocaleString("pt-BR")}`);
+
+        updatePublishProgress(92, "Acordando o Netlify… ✨");
+        publishStatus.textContent = "Publicado ✅ Netlify vai atualizar automaticamente.";
+
+        // set modes: bundle on, urls off
+        if(elBundle) elBundle.checked = true;
+        if(elUseUrls) elUseUrls.checked = false;
+
+        // generate QR with created timestamp
+        generate();
+
+        updatePublishProgress(100, "Publicado! 💖");
+        stopCinematicLines();
+        showToast("ok","Publicado com sucesso!","Aguarde ~20–60s pro Netlify atualizar. Depois escaneie o QR e pronto. 💖", 7000);
+
+      }catch(e){
+        const msg = e?.message || String(e);
+        publishStatus.textContent = "Erro: " + msg;
+        showToast("err","Falha ao publicar", msg, 9000);
+      }finally{
+        stopCinematicLines();
+        setTimeout(()=>{ resetPublishProgress(); }, 900);
+        btnPublish.disabled = false;
+        btnPublish.style.opacity = "1";
+        btnPublish.textContent = (btnPublish.dataset.prevText || "Publicar (GitHub + Netlify)");
+        if(btnGen){ btnGen.disabled = false; btnGen.style.opacity = "1"; }
+      }
+    });
+
+
     // default demo text
     elTo.value = "Júlia";
     elFrom.value = "Pedro";
     elMsg.value = "Eu te amo mais do que consigo explicar. Obrigado(a) por existir. 💖";
   </script>
+
+  <div class="toastHost" id="toastHost" aria-live="polite" aria-atomic="true"></div>
 </body>
 </html>
